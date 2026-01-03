@@ -1,6 +1,9 @@
 import math
+import cmath
 
-from canvas import *
+from canvas import Canvas
+from geometry import HCircle, HPolygon, HSegment
+import pygame
 
 import threading
 
@@ -8,16 +11,17 @@ import threading
 class Hypertle(Canvas):
     def __init__(self, r: int, turtle_scale: int):
         Canvas.__init__(self, r)
-        self.turtle_shape = [(1., 0.), (-1., 1.), (0., 0.), (-1., -1.)]
+        self.turtle_shape = [(0.4, 0.), (-0.4, 0.4), (0., 0.), (-0.4, -0.4)]
         self.turtle_scale = turtle_scale
         self.turtle_phase = 0.
         self.pen_down = True
 
     def draw(self):
         Canvas.draw(self)
-        self.__draw_turtle()
+        if self.pen_down:
+            self.__draw_turtle()
 
-    def fd(self, x):
+    def fd(self, x: float):
         z = cmath.rect(math.tanh(x / (2 * self.R)), math.radians(self.turtle_phase))
         self.components.translate(z)
         if self.pen_down:
@@ -27,19 +31,19 @@ class Hypertle(Canvas):
 
     def pu(self): self.pen_down = False
 
-    def rt(self, theta):
+    def rt(self, theta: float):
         self.turtle_phase = (self.turtle_phase + theta) % 360
 
-    def circle(self, r):
+    def circle(self, r: float):
         self.add(HCircle(0., r / self.R, self.color))
 
-    def bk(self, x):
+    def bk(self, x: float):
         self.fd(-x)
 
-    def lt(self, theta):
+    def lt(self, theta: float):
         self.rt(-theta)
 
-    def polygon(self, n: int, theta):
+    def polygon(self, n: int, theta: float):
         self.add(HPolygon(0., n, math.radians(theta), math.radians(self.turtle_phase), self.color))
 
     def __draw_turtle(self):
@@ -51,7 +55,7 @@ class Hypertle(Canvas):
         pygame.draw.polygon(self.surface, self.color, turtle_points)
 
 
-def get_float(q):
+def get_float(q: list[str]) -> float:
     top = q.pop(0)
     try:
         return float(top)
@@ -97,9 +101,12 @@ def get_float(q):
                 return math.cosh(get_float(q))
             case 'th':
                 return math.tanh(get_float(q))
+            case _:
+                print(f"Error parsing float expression: {top}")
+                return 0.0
 
 
-def parse(cmd_queue):
+def parse(cmd_queue: list[str]):
     global exit_flag
     while len(cmd_queue) > 0:
         token = cmd_queue.pop(0)
@@ -147,10 +154,12 @@ def parse(cmd_queue):
 
                     sub_cmd = cmd_queue[:i]
 
-                    for j in range(n):
+                    for _ in range(n):
                         parse(sub_cmd.copy())
 
                     cmd_queue = cmd_queue[i + 1:]
+            case _:
+                print(f"Unknown command: {token}")
 
 
 

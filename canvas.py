@@ -1,4 +1,4 @@
-from geometry import *
+from geometry import HShape
 import pygame
 
 
@@ -26,7 +26,7 @@ class Canvas:
     def add(self, s: HShape):
         self.components.append(s)
 
-    def transform(self, z):
+    def transform(self, z: complex):
         return (z.real + 1.) * self.R, (z.imag + 1.) * self.R
 
     def clear(self):
