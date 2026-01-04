@@ -7,7 +7,7 @@ import pygame
 from cli import parse
 import threading
 
-class Hypertle_BACKUP(Canvas):
+class Hypertle(Canvas):
     def __init__(self, r: int, turtle_scale: int):
         Canvas.__init__(self, r)
         self.turtle_shape = [(0.4, 0.), (-0.4, 0.4), (0., 0.), (-0.4, -0.4)]
@@ -44,35 +44,6 @@ class Hypertle_BACKUP(Canvas):
 
     def polygon(self, n: int, theta: float):
         self.add(HPolygon(0., n, math.radians(theta), math.radians(self.turtle_phase), self.color))
-
-    def __draw_turtle(self):
-        turtle_points = [
-            pygame.math.Vector2(p).rotate(self.turtle_phase) * self.turtle_scale +
-            pygame.math.Vector2(self.R, self.R)
-            for p in self.turtle_shape
-        ]
-        pygame.draw.polygon(self.surface, self.color, turtle_points)
-
-
-class Hypertle(Hypertle_BACKUP):
-    def __init__(self, R: int, turtle_scale: int):
-        Hypertle_BACKUP.__init__(self, R, turtle_scale)
-
-    def draw(self):
-        Canvas.draw(self)
-        self.__draw_turtle()
-    
-    def fd(self, x: float):
-        Hypertle_BACKUP.fd(self, x)
-    
-    def bk(self, x: float):
-        Hypertle_BACKUP.bk(self, x)
-    
-    def rt(self, theta: float):
-        Hypertle_BACKUP.rt(self, theta)
-
-    def lt(self, theta: float):
-        Hypertle_BACKUP.lt(self, theta)
 
     def __draw_turtle(self):
         turtle_points = [
