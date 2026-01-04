@@ -55,23 +55,23 @@ class Hypertle_BACKUP(Canvas):
 
 
 class Hypertle(Hypertle_BACKUP):
-    def __init__(self, R, turtle_scale):
+    def __init__(self, R: int, turtle_scale: int):
         Hypertle_BACKUP.__init__(self, R, turtle_scale)
 
     def draw(self):
         Canvas.draw(self)
         self.__draw_turtle()
     
-    def fd(self, x):
+    def fd(self, x: float):
         Hypertle_BACKUP.fd(self, x)
     
-    def bk(self, x):
+    def bk(self, x: float):
         Hypertle_BACKUP.bk(self, x)
     
-    def rt(self, theta):
+    def rt(self, theta: float):
         Hypertle_BACKUP.rt(self, theta)
 
-    def lt(self, theta):
+    def lt(self, theta: float):
         Hypertle_BACKUP.lt(self, theta)
 
     def __draw_turtle(self):
@@ -84,9 +84,10 @@ class Hypertle(Hypertle_BACKUP):
 
 
 def background():
+    global exit_flag, turtle
     while not exit_flag:
         cmd_queue = input('> ').strip('\n').split(' ')
-        parse(cmd_queue)
+        parse(cmd_queue, turtle=turtle)
 
 
 exit_flag = False

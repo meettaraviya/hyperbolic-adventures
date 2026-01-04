@@ -66,28 +66,38 @@ class HSegment(HShape):
         self.color = color
     
     def __str__(self) -> str:
+        p0 = self[0]
+        p1 = self[1]
+        assert isinstance(p0, HPoint)
+        assert isinstance(p1, HPoint)
         return "({x1:.2f})--({x2:.2f})".format(
-            x1=self[0].z,
-            x2=self[1].z
+            x1=p0.z,
+            x2=p1.z
         )
     
     def __repr__(self) -> str:
         return self.__str__()
 
     def draw(self, turtle: Any):
-        d = self[0].z.conjugate() * self[1].z - self[1].z.conjugate() * self[0].z
+        # Type assertions for Pylance
+        p0 = self[0]
+        p1 = self[1]
+        assert isinstance(p0, HPoint)
+        assert isinstance(p1, HPoint)
+        
+        d = p0.z.conjugate() * p1.z - p1.z.conjugate() * p0.z
         # if abs
         if abs(d) < TOLERANCE:
             pygame.draw.aaline(
                 turtle.surface,
                 self.color,
-                turtle.transform(self[0].z),
-                turtle.transform(self[1].z)
+                turtle.transform(p0.z),
+                turtle.transform(p1.z)
             )
         else:
-            # x = (self[0].z * self[1].z * (self[0].z.conjugate() - self[1].z.conjugate()) + self[1].z - self[0].z) / d
-            x = ((1 + abs(self[0].z) ** 2) * self[1].z - (1 + abs(self[1].z) ** 2) * self[0].z) / d
-            r = abs(x - self[0].z)
+            # x = (p0.z * p1.z * (p0.z.conjugate() - p1.z.conjugate()) + p1.z - p0.z) / d
+            x = ((1 + abs(p0.z) ** 2) * p1.z - (1 + abs(p1.z) ** 2) * p0.z) / d
+            r = abs(x - p0.z)
             top_left = turtle.transform(x - r * (1. + 1.j))
             rect = pygame.Rect(
                 top_left[0],
@@ -100,16 +110,16 @@ class HSegment(HShape):
                     turtle.surface,
                     self.color,
                     rect,
-                    -cmath.phase(self[0].z - x),
-                    -cmath.phase(self[1].z - x)
+                    -cmath.phase(p0.z - x),
+                    -cmath.phase(p1.z - x)
                 )
             else:
                 pygame.draw.arc(
                     turtle.surface,
                     self.color,
                     rect,
-                    -cmath.phase(self[1].z - x),
-                    -cmath.phase(self[0].z - x)
+                    -cmath.phase(p1.z - x),
+                    -cmath.phase(p0.z - x)
                 )
 
 
@@ -120,10 +130,14 @@ class HCircle(HShape):
         self.color = color
 
     def draw(self, turtle: Any):
-        c_ns = (self[0].z * self[0].z.conjugate()).real
+        # Type assertion for Pylance
+        p0 = self[0]
+        assert isinstance(p0, HPoint)
+        
+        c_ns = (p0.z * p0.z.conjugate()).real
         r_e0 = math.tanh(self.r / 2)
         r_e = r_e0 * (1. - c_ns) / (1. - c_ns * (r_e0 ** 2))
-        c_e = (1. - r_e0 ** 2) / (1. - c_ns * (r_e0 ** 2)) * self[0].z
+        c_e = (1. - r_e0 ** 2) / (1. - c_ns * (r_e0 ** 2)) * p0.z
         pygame.draw.circle(
             turtle.surface,
             self.color,
@@ -146,4 +160,5 @@ class HPolygon(HShape):
                 c + cmath.rect(r, phi2),
                 color
             ))
-        HShape.__init__(self, sides)
+        from typing import cast
+        HShape.__init__(self, cast(list['HShape | HPoint'], sides))

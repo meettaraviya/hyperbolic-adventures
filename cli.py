@@ -1,6 +1,6 @@
 import math
 
-def get_int(q):
+def get_int(q: list[str]) -> int:
     top = q.pop(0)
     try:
         return int(top)
@@ -14,8 +14,10 @@ def get_int(q):
                 return get_int(q) // get_int(q)
             case '-':
                 return get_int(q) - get_int(q)
+            case _:
+                raise ValueError(f"Unknown operator: {top}")
 
-def get_float(q):
+def get_float(q: list[str]) -> float:
     top = q.pop(0)
     try:
         return float(top)
@@ -61,9 +63,12 @@ def get_float(q):
                 return math.cosh(get_float(q))
             case 'th':
                 return math.tanh(get_float(q))
+            case _:
+                raise ValueError(f"Unknown operator: {top}")
 
+from typing import Any, Optional
 
-def parse(cmd_queue, turtle=None, exit_flag_ref=None):
+def parse(cmd_queue: list[str], turtle: Optional[Any] =None, exit_flag_ref: Optional[list[bool]] =None):
     """Parse and execute commands for the turtle
     
     Args:
@@ -75,6 +80,9 @@ def parse(cmd_queue, turtle=None, exit_flag_ref=None):
         turtle = globals().get('turtle')
     if exit_flag_ref is None:
         exit_flag_ref = [globals().get('exit_flag', False)]
+    
+    # Ensure turtle is not None
+    assert turtle is not None, "Turtle must be provided or set in globals"
     
     while len(cmd_queue) > 0:
         token = cmd_queue.pop(0)
@@ -125,9 +133,10 @@ def parse(cmd_queue, turtle=None, exit_flag_ref=None):
 
                     sub_cmd = cmd_queue[:i]
 
-                    for j in range(n):
+                    for _ in range(n):
                         parse(sub_cmd.copy(), turtle, exit_flag_ref)
 
                     cmd_queue = cmd_queue[i + 1:]
-
-
+            case _:
+                # Ignore unknown tokens
+                pass
