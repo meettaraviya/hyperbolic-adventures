@@ -58,7 +58,7 @@ def background():
     global exit_flag, turtle
     while not exit_flag:
         cmd_queue = input('> ').strip('\n').split(' ')
-        parse(cmd_queue, turtle=turtle)
+        parse(cmd_queue, turtle=turtle, local_vars={'R': turtle.R})
 
 
 exit_flag = False
